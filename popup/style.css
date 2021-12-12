@@ -1,0 +1,34 @@
+body{
+    margin:0;
+	height:100%;
+    width: 100%;
+	overflow-x: hidden;
+    border:3px solid white;  
+}
+
+#wrapper{
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    background-color: #F4F4F4;
+    width:480px;
+    height:120px;
+    flex-direction: column;
+}
+#wrappermessage{
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    padding: 0.3em 0.8em;
+    background-color: #dadada;
+    width:fit-content;
+    height: min-content;
+    border-radius: 0.5em;
+    box-shadow: #b8b8b8;
+}
+
+#message{
+    font:1em solid white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Keep Links",
+  "description" : "Get tab Url",
+  "version": "0.0",
+  "permissions":[
+    "tabs",
+    "http://*/",
+    "https://*/",
+    "activeTab",
+    "*://*/*",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_icon": "popup/icon.png",
+    "default_popup":"popup/popup.html"
+
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "manifest_version": 2
+
+}
+

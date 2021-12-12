@@ -9,8 +9,7 @@ function connLogger () {
 //let port = process.env.PORT;
 function sendTabdata (tab) {
   console.log("Send Tab: " + tab);
-  console.log('http://localhost:5000/hello');
-  xj.open("POST", "http://localhost:5000/hello", true);
+  xj.open("POST", "https://stashlinks-backend.herokuapp.com/"+process.env.PORT, true);
   xj.setRequestHeader("Content-Type", "application/json");
   xj.send(JSON.stringify({ "data": tab }));
   xj.onreadystatechange = connLogger();

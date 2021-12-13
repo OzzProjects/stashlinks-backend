@@ -2,7 +2,13 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
-const childProcess = require('child_process');
+const { Client } = require('pg');
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 
 let port = process.env.PORT;
@@ -24,52 +30,96 @@ app.use(bodyParser.json());
 app.post('/hello', function (req, res, next) {
   const data = req.body.data;
   console.log('Url Address: ' + data);
-  sendDataDatabase('database.js',data,logError);
+  sendDataDatabase(data,logError);
 });
 
-
 app.listen(port);
-
-
-function sendDataDatabase(fileAddress, data,callback){
-
-    //The boolean condition 'invoked' well tell us if child file has been forked or not
-    //keep track of whether callback has been invoked to prevent multiple invocations
-    //[],{stdio: 'pipe', execArgv: [] }
-    var invoked = false;
-    var process = childProcess.fork(fileAddress);
-
-    //Send Url link data to child file
-    if(data!=null){
-        console.log("Data before:"+data)
-        process.send( {url: data});
-    }
-
-    //Confirmation of data sent towards database
-    process.on('message', function (data) {
-        if (invoked) return;
-        invoked = true;
-        callback(err);
-        console.log("Get Response after Url sent: "+data);
-    });
-
-    // listen for errors as they may prevent the exit event from firing
-    process.on('error', function (err) {
-        if (invoked) return;
-        invoked = true;
-        callback(err);
-    });
-
-    // execute the callback once the process has finished running
-    process.on('exit', function (code) {
-        if (invoked) return;
-        invoked = true;
-        var err = code === 0 ? null : new Error('exit code ' + code);
-        callback(err);
-    });
-}
 
 function logError(err) {
   if (err) throw err;
   console.log('Just sent data to running Database.js');
 };
+
+function sendDataDatabase(data, callback){
+    console.log('Recieved Url data: '+data.url);
+    client.connect();
+
+    if(data!=null){
+
+        var newUrl= urlParser(data.url);
+
+        const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
+        const values = [newUrl]
+        // callback
+        client.query(text, values, (err, res) => {
+          if (err) {
+            console.log(err.stack)
+            callback(err);
+          } else {
+            console.log(res.rows[0])
+            callback(res);
+
+          }
+        })
+        
+    }
+
+};
+
+
+
+
+
+//Url Node Parser
+
+function urlParser(url){
+
+// Return url extensions if its extenions page
+if(url==="chrome://extensions/"){
+   return url.subString(10,20);
+}
+
+//Return correct url form
+if(url.includes("https://")){
+
+    // Get last point before url post location
+    var locationUrl=url.indexOf("/",11); 
+
+    // Seperate base url from urls with queries 
+    var urlData=url.substring(8,url.length);
+
+    console.log("Location: "+locationUrl);
+    console.log("Substring: "+urlData);
+
+    var newUrl="";
+    if(urlData.includes("www.")){
+     
+        newUrl=urlData.substring(4,urlData.length);
+        console.log("lll"+newUrl)
+    
+        if(newUrl.includes(".")){
+
+            var getposturl=newUrl.substring(0,newUrl.indexOf('.',0));
+            console.log("Final url1: "+getposturl);
+            return getposturl;
+        }
+        var getposturl=newUrl;
+        console.log("Final url2: "+getposturl);
+        return getposturl;
+
+    } else{
+
+    if(urlData.includes("/")){
+
+        var getposturl=urlData.substring(0,urlData.indexOf('.',0));
+        console.log("Final url3: "+getposturl);
+        return getposturl;
+    }
+    var getposturl=urlData;
+    console.log("Final url4: "+getposturl);
+    return getposturl;
+
+
+    }
+}
+}

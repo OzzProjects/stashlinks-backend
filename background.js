@@ -4,6 +4,16 @@ function connLogger () {
   if (xj.readyState == 4 && xj.status == 200) {
     console.log(xj.responseText);
   }
+  else if (xj.status == 400) {
+    console.log(xj.responseText);
+  }
+  else if ( xj.status == 500) {
+    console.log(xj.responseText);
+  }
+  else{
+    console.log(xj.status);
+    console.log(xj.responseText);
+  }
 };
 
 //let port = process.env.PORT;

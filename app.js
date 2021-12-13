@@ -46,7 +46,7 @@ function sendDataDatabase(data, callback){
 
     if(data!=null){
 
-        var newUrl= urlParser(data.url);
+        var newUrl= urlParser(data.url.toString());
 
         const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
         const values = [newUrl]
@@ -72,8 +72,9 @@ function sendDataDatabase(data, callback){
 
 //Url Node Parser
 
-function urlParser(url){
+function urlParser(data){
 
+  var url=data.toString();
 // Return url extensions if its extenions page
 if(url==="chrome://extensions/"){
    return url.subString(10,20);

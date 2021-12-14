@@ -91,7 +91,7 @@ function sendDataDatabase(data, callback){
           callback(res);
 
         }
-        
+
         client.end(err => {
           console.log('client has disconnected')
           if (err) {
@@ -102,7 +102,8 @@ function sendDataDatabase(data, callback){
 
   }
 
-          return response;
+  console.log("Final response:"+response);
+  return response;
 
 };
 

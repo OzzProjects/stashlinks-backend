@@ -30,7 +30,8 @@ app.use(bodyParser.json());
 app.post('/hello', function (req, res, next) {
   const data = req.body.data;
   console.log('Url Address: ' + data); 
-  sendDataDatabase(data.toString(),logError);
+
+  sendDataDatabase(""+data+"",logError);
 });
 
 app.listen(port);

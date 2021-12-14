@@ -31,41 +31,63 @@ app.post('/hello', function (req, res, next) {
   const data = req.body.data;
   console.log('Url Address: ' + data); 
 
-  sendDataDatabase(""+data+"",logError);
+  var response=sendDataDatabase(""+data+"",logError);
+
+  if(response==""){
+   res.status(404).send({data:'Database error: Connection problem'});
+  }else if (response=="Failed"){
+   res.status(204).send({data:'Database error: Insert problem'});
+
+  }else if(response=="Success"){
+    res.status(200).send({data:'Succesful Record into database'});
+  }else{
+    res.status(404).send({data:'Database error: Something wrong'});
+  }
+
+
 });
 
 app.listen(port);
 
 function logError(err) {
-  if (err) throw err;
+  if (err){ 
+     return "Failed";
+  }else{
   console.log('Just sent data to running Database.js');
+     return "Success";
+  }
 };
 
 function sendDataDatabase(data, callback){
     console.log('Recieved Url data: '+data);
+    var response="";
     client.connect();
             if(data!=null){
 
               var newUrl= urlParser(data);
               console.log("Url Parsed:"+newUrl);
 
-              const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
+              const text = 'INSERT INTO links("'+newUrl+'") VALUES($1) RETURNING *'
               const values = [newUrl]
               // callback
               client.query(text, values, (err, res) => {
                 if (err) {
                   console.log("Insert Failed:")
                   console.log(err.stack)
+                  response="Failed";
                   callback(err);
                 } else {
                   console.log("Insert Succeded:")
                   console.log(res.rows[0])
+                  response="Success";
                   callback(res);
 
                 }
               })
-              
+              client.end();
           }
+
+          return response;
 
 };
 

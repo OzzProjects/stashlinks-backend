@@ -78,7 +78,7 @@ function urlParser(data){
   var url=data.toString();
 // Return url extensions if its extenions page
 if(url==="chrome://extensions/"){
-   return url.subString(10,20);
+   return url.substring(10,20);
 }
 
 //Return correct url form

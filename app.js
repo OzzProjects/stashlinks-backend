@@ -61,31 +61,46 @@ function logError(err) {
 function sendDataDatabase(data, callback){
     console.log('Recieved Url data: '+data);
     var response="";
-    client.connect();
-            if(data!=null){
 
-              var newUrl= urlParser(data);
-              console.log("Url Parsed:"+newUrl);
+    client.connect(err => {
+      if (err) {
+        console.error('connection error', err.stack)
+      } else {
+        console.log('connected')
+      }
+    });
 
-              const text = 'INSERT INTO links("'+newUrl+'") VALUES($1) RETURNING *'
-              const values = [newUrl]
-              // callback
-              client.query(text, values, (err, res) => {
-                if (err) {
-                  console.log("Insert Failed:")
-                  console.log(err.stack)
-                  response="Failed";
-                  callback(err);
-                } else {
-                  console.log("Insert Succeded:")
-                  console.log(res.rows[0])
-                  response="Success";
-                  callback(res);
+    if(data!=null){
 
-                }
-              })
-              client.end();
+      var newUrl= urlParser(data);
+      console.log("Url Parsed:"+newUrl);
+
+      const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
+      const values = [newUrl]
+      // callback
+      client.query(text, values, (err, res) => {
+        if (err) {
+          console.log("Insert Failed:")
+          console.log(err.stack)
+          response="Failed";
+          callback(err);
+        } else {
+          console.log("Insert Succeded:")
+          console.log(res.rows[0])
+          response="Success";
+          callback(res);
+
+        }
+        
+        client.end(err => {
+          console.log('client has disconnected')
+          if (err) {
+            console.log('error during disconnection', err.stack)
           }
+        })
+      })
+
+  }
 
           return response;
 
@@ -102,7 +117,7 @@ function urlParser(data){
   var url=data.toString();
 // Return url extensions if its extenions page
 if(url==="chrome://extensions/"){
-   return url.substring(10,20);
+   return url.substring(9,19);
 }
 
 //Return correct url form

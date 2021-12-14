@@ -42,12 +42,12 @@ function logError(err) {
 };
 
 function sendDataDatabase(data, callback){
-    console.log('Recieved Url data: '+data.url);
+    console.log('Recieved Url data: '+data);
     client.connect();
 
     if(data!=null){
 
-        var newUrl= urlParser(data.url.toString());
+        var newUrl= urlParser(data);
 
         const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
         const values = [newUrl]

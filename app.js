@@ -44,26 +44,28 @@ function logError(err) {
 function sendDataDatabase(data, callback){
     console.log('Recieved Url data: '+data);
     client.connect();
+            if(data!=null){
 
-    if(data!=null){
+              var newUrl= urlParser(data);
+              console.log("Url Parsed:"+newUrl);
 
-        var newUrl= urlParser(data);
+              const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
+              const values = [newUrl]
+              // callback
+              client.query(text, values, (err, res) => {
+                if (err) {
+                  console.log("Insert Failed:")
+                  console.log(err.stack)
+                  callback(err);
+                } else {
+                  console.log("Insert Succeded:")
+                  console.log(res.rows[0])
+                  callback(res);
 
-        const text = 'INSERT INTO links(link) VALUES($1) RETURNING *'
-        const values = [newUrl]
-        // callback
-        client.query(text, values, (err, res) => {
-          if (err) {
-            console.log(err.stack)
-            callback(err);
-          } else {
-            console.log(res.rows[0])
-            callback(res);
-
+                }
+              })
+              
           }
-        })
-        
-    }
 
 };
 
